@@ -34,19 +34,19 @@ export const App = () => {
   };
 
   const sortAlphabetically = () => {
-    let sorted = [...goodsFromServer].sort((a, b) => a.localeCompare(b));
+    const sorted = [...goodsFromServer].sort((a, b) => a.localeCompare(b));
 
-    if (isReversed) sorted = sorted.reverse();
     setGoods(sorted);
     setSortBy('alphabet');
+    setIsReversed(false);
   };
 
   const sortByLength = () => {
-    let sorted = [...goodsFromServer].sort((a, b) => a.length - b.length);
+    const sorted = [...goodsFromServer].sort((a, b) => a.length - b.length);
 
-    if (isReversed) sorted = sorted.reverse();
     setGoods(sorted);
     setSortBy('length');
+    setIsReversed(false);
   };
 
   const getButtonClass = buttonType => {
