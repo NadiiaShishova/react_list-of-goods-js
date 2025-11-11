@@ -15,84 +15,58 @@ export const goodsFromServer = [
   'Garlic',
 ];
 
+const NOT_ACTIVE_CLASS = 'is-light';
+
 export const App = () => {
-  const [goods, setGoods] = useState(goodsFromServer);
-  const [sortType, setSortType] = useState(null);
+  const [goods, setGoods] = useState([...goodsFromServer]);
   const [isReversed, setIsReversed] = useState(false);
+  const [sortBy, setSortBy] = useState(null);
 
-  const sortAlphabetically = () => {
-    const sorted = [...goods].sort((a, b) => a.localeCompare(b));
-
-    setGoods(sorted);
-    setSortType('alpha');
-  };
-
-  const sortByLength = () => {
-    const sorted = [...goodsFromServer].sort((a, b) => {
-      if (a.length === b.length) {
-        return a.localeCompare(b);
-      }
-
-      return a.length - b.length;
-    });
-
-    setGoods(sorted);
-    setSortType('length');
+  const resetGoods = () => {
+    setGoods([...goodsFromServer]);
+    setIsReversed(false);
+    setSortBy(null);
   };
 
   const reverseGoods = () => {
-    const reversed = [...goods].reverse();
-
-    setGoods(reversed);
+    setGoods([...goods].reverse());
     setIsReversed(!isReversed);
   };
 
-  const resetGoods = () => {
-    setGoods(goodsFromServer);
-    setSortType(null);
-    setIsReversed(false);
+  const sortAlphabetically = () => {
+    let sorted = [...goodsFromServer].sort((a, b) => a.localeCompare(b));
+
+    if (isReversed) sorted = sorted.reverse();
+    setGoods(sorted);
+    setSortBy('alphabet');
   };
 
-  const isInitial = JSON.stringify(goods) === JSON.stringify(goodsFromServer);
+  const sortByLength = () => {
+    let sorted = [...goodsFromServer].sort((a, b) => a.length - b.length);
+
+    if (isReversed) sorted = sorted.reverse();
+    setGoods(sorted);
+    setSortBy('length');
+  };
+
+  const getButtonClass = buttonType => {
+    switch (buttonType) {
+      case 'reverse':
+        return isReversed ? '' : NOT_ACTIVE_CLASS;
+      case 'alphabet':
+        return sortBy === 'alphabet' ? '' : NOT_ACTIVE_CLASS;
+      case 'length':
+        return sortBy === 'length' ? '' : NOT_ACTIVE_CLASS;
+      default:
+        return '';
+    }
+  };
+
+  const isResetVisible = () => goods.toString() !== goodsFromServer.toString();
 
   return (
-    <div className="section content">
-      <div className="buttons">
-        <button
-          type="button"
-          className={`button is-info ${sortType === 'alpha' ? '' : 'is-light'}`}
-          onClick={sortAlphabetically}
-        >
-          Sort alphabetically
-        </button>
-
-        <button
-          type="button"
-          className={`button is-success ${sortType === 'length' ? '' : 'is-light'}`}
-          onClick={sortByLength}
-        >
-          Sort by length
-        </button>
-
-        <button
-          type="button"
-          className={`button is-warning ${isReversed ? '' : 'is-light'}`}
-          onClick={reverseGoods}
-        >
-          Reverse
-        </button>
-
-        {!isInitial && (
-          <button
-            type="button"
-            className="button is-danger"
-            onClick={resetGoods}
-          >
-            Reset
-          </button>
-        )}
-      </div>
-
+    <div className="App">
+      <h1>Goods List</h1>
       <ul>
         {goods.map(good => (
           <li key={good} data-cy="Good">
@@ -100,6 +74,34 @@ export const App = () => {
           </li>
         ))}
       </ul>
+      <div className="buttons">
+        <button
+          type="button"
+          className={getButtonClass('reverse')}
+          onClick={reverseGoods}
+        >
+          Reverse
+        </button>
+        <button
+          type="button"
+          className={getButtonClass('alphabet')}
+          onClick={sortAlphabetically}
+        >
+          Sort alphabetically
+        </button>
+        <button
+          type="button"
+          className={getButtonClass('length')}
+          onClick={sortByLength}
+        >
+          Sort by length
+        </button>
+        {isResetVisible() && (
+          <button type="button" onClick={resetGoods}>
+            Reset
+          </button>
+        )}
+      </div>
     </div>
   );
 };
